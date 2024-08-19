@@ -8,12 +8,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public interface DockerConnect {
-    <T, R extends DockerCmd<T>> R command(Function<DockerClient, R> cmd);
-
-    <T, R extends DockerCmd<T>> R command(BiFunction<DockerClient, String, R> cmd, String s);
-
-//    <R, T extends DockerCmd<R>> R command(Function<DockerClient, T> cmd);
-
     static String imageTag(DockerImageRecord image) {
         StringBuilder imageTagBuilder = new StringBuilder();
         if (!image.getRepo().isEmpty()) {
@@ -27,4 +21,10 @@ public interface DockerConnect {
         }
         return imageTagBuilder.toString();
     }
+
+    <T, R extends DockerCmd<T>> R command(Function<DockerClient, R> cmd);
+
+//    <R, T extends DockerCmd<R>> R command(Function<DockerClient, T> cmd);
+
+    <T, R extends DockerCmd<T>> R command(BiFunction<DockerClient, String, R> cmd, String s);
 }

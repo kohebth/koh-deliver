@@ -1,5 +1,4 @@
-rootProject.name = "koh"
-include("core", "datahub", "deliver")
-project(":core").projectDir = file("core")
+rootProject.name = "koh-vps-provider"
+include("datahub", "vps-provider")
 project(":datahub").projectDir = file("datahub")
-project(":deliver").projectDir = file("deliver")
+project(":vps-provider").projectDir = file("vps-provider")

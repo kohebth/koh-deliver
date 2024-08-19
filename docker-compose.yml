@@ -1,0 +1,23 @@
+version: "3.18"
+
+services:
+  deliver:
+    env_file: .env
+    build:
+      dockerfile: docker/deliver.Dockerfile
+      context: .
+    image: koh/vps_provider-app
+    container_name: vps_provider
+    networks:
+      - default
+    deploy:
+      resources:
+        limits:
+          cpus: 0.2
+          memory: 200M
+networks:
+  vps-network:
+    external: true
+  default:
+    name: vps-network
+    external: true

@@ -35,17 +35,14 @@ public interface DockerContainer extends DockerConnect {
     ) {
         String dockerContainerId;
 
-        List<Bind> binds = dockerVolumes
-                .stream()
-                .map(v -> new Bind(v.getName(), new Volume(v.getVirtual())))
-                .collect(Collectors.toList());
+        List<Bind> binds = dockerVolumes.stream().map(v -> new Bind(v.getName(), new Volume(v.getVirtual()))).collect(
+                Collectors.toList());
 
         HostConfig hostConfig = HostConfig.newHostConfig().withBinds(binds);
         List<ExposedPort> exposedPorts = List.of(new ExposedPort(22));
 
         try (CreateContainerCmd cmd = command(c -> c.createContainerCmd(dockerContainer.getName()))) {
-            dockerContainerId = cmd
-                    .withName(dockerContainer.getName())
+            dockerContainerId = cmd.withName(dockerContainer.getName())
                     .withHostConfig(hostConfig)
                     .withExposedPorts(exposedPorts)
                     .withImage(dockerImage.getName() + ':' + dockerImage.getVersion())
@@ -56,8 +53,7 @@ public interface DockerContainer extends DockerConnect {
 
         if (dockerContainerId != null) {
             try (ConnectToNetworkCmd cmd = command(DockerClient::connectToNetworkCmd)) {
-                dockerNetworks.forEach(nw -> cmd
-                        .withNetworkId(nw.getName())
+                dockerNetworks.forEach(nw -> cmd.withNetworkId(nw.getName())
                         .withContainerId(dockerContainer.getName())
                         .exec());
             }
@@ -75,6 +71,13 @@ public interface DockerContainer extends DockerConnect {
     default String doesExist(DockerContainerRecord container) {
         try (ListContainersCmd cmd = command(DockerClient::listContainersCmd)) {
             List<Container> containers = cmd.withShowAll(true).withNameFilter(List.of(container.getName())).exec();
+            return containers.isEmpty() ? null : containers.get(0).getId();
+        }
+    }
+
+    default String isRunning(DockerContainerRecord container) {
+        try (ListContainersCmd cmd = command(DockerClient::listContainersCmd)) {
+            List<Container> containers = cmd.withShowAll(false).withNameFilter(List.of(container.getName())).exec();
             return containers.isEmpty() ? null : containers.get(0).getId();
         }
     }
