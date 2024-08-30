@@ -1,4 +1,4 @@
-rootProject.name = "koh-vps-provider"
-include("datahub", "vps-provider")
+rootProject.name = "vpsmanager"
+include("datahub", "vpsmanager")
 project(":datahub").projectDir = file("datahub")
-project(":vps-provider").projectDir = file("vps-provider")
+project(":vpsmanager").projectDir = file("vpsmanager")

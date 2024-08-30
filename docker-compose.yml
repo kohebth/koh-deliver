@@ -4,10 +4,10 @@ services:
   deliver:
     env_file: .env
     build:
-      dockerfile: docker/deliver.Dockerfile
+      dockerfile: docker/vpsmanager.Dockerfile
       context: .
-    image: koh/vps_provider-app
-    container_name: vps_provider
+    image: koh/vpsmanager
+    container_name: vpsmanager
     networks:
       - default
     deploy:
@@ -19,5 +19,5 @@ networks:
   vps-network:
     external: true
   default:
-    name: vps-network
+    name: kafka-network
     external: true
