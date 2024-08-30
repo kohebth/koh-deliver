@@ -1,6 +1,6 @@
 FROM openjdk:11-jdk-slim-buster
 
-COPY deliver/build/distributions/vpsmanager-1.0-SNAPSHOT.tar /opt/dist.tar
+COPY vpsmanager/build/distributions/vpsmanager-1.0-SNAPSHOT.tar /opt/dist.tar
 WORKDIR /
 RUN tar -xf /opt/dist.tar
 RUN mv vpsmanager-1.0-SNAPSHOT/bin/* /bin

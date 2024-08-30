@@ -19,7 +19,7 @@ repositories {
 }
 
 application {
-    mainClass.set("koh.service.manage.vps.App")
+    mainClass.set("koh.service.manager.vps.App")
 }
 
 dependencies {
