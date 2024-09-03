@@ -1,10 +1,9 @@
 package koh.service.manager.vps.handler;
 
+import koh.db.hub.metadata.MetaEnv;
 import koh.db.hub.repository.*;
-import koh.db.hub.vps_management.tables.records.DockerContainerRecord;
-import koh.db.hub.vps_management.tables.records.DockerImageRecord;
-import koh.db.hub.vps_management.tables.records.DockerNetworkRecord;
-import koh.db.hub.vps_management.tables.records.DockerVolumeRecord;
+import koh.db.hub.vps_management.enums.UserMetadataType;
+import koh.db.hub.vps_management.tables.records.*;
 import koh.service.manager.vps.docker.Remote;
 import koh.service.manager.vps.kafka.KafkaProducerWorker;
 import koh.service.manager.vps.message.ContainerIdMessage;
@@ -24,6 +23,7 @@ public class StartDockerHandler extends AbstractRemoteHandler {
     ContainerRepository containerRepository = new ContainerRepository();
     NetworkRepository networkRepository = new NetworkRepository();
     CompositeRepository compositeRepository = new CompositeRepository();
+    UserMetadataRepository userMetadataRepository = new UserMetadataRepository();
     Remote docker = new Remote();
 
     public StartDockerHandler(KafkaProducerWorker bus) {
@@ -41,6 +41,12 @@ public class StartDockerHandler extends AbstractRemoteHandler {
         DockerContainerRecord container = containerRepository.getContainerById(setup.getContainerId());
         List<DockerNetworkRecord> networks = networkRepository.getNetworkByIds(setup.getNetworkIds());
         List<DockerVolumeRecord> volumes = volumeRepository.getVolumeByIds(setup.getVolumeIds());
+        UserMetadataRecord userMetadataRecord = userMetadataRepository.getMetadata(
+                setup.getUserId(),
+                UserMetadataType.ENVIRONMENT
+        ).orElseThrow();
+
+        MetaEnv metaEnv = JsonTools.fromJson(userMetadataRecord.getBlob());
 
         for (DockerNetworkRecord network : networks) {
             if (docker.doesExist(network) == null) {
@@ -60,7 +66,8 @@ public class StartDockerHandler extends AbstractRemoteHandler {
 
         String dockerContainerId = docker.doesExist(container);
         if (dockerContainerId == null) {
-            dockerContainerId = docker.create(container, image, networks, volumes);
+            MetaEnv.Credential credential = metaEnv.getCredentials().get(container.getId());
+            dockerContainerId = docker.create(container, image, networks, volumes, credential);
         }
 
         docker.start(container);
