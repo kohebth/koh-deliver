@@ -1,9 +1,10 @@
 package koh.service.manager.vps.message;
 
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 public class CreateContainerMessage {
     Long userId;
     String name;
+    Integer memory;
 }

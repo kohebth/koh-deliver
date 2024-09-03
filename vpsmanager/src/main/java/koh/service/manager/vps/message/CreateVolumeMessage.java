@@ -1,8 +1,8 @@
 package koh.service.manager.vps.message;
 
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 public class CreateVolumeMessage {
     String name;
     String host;

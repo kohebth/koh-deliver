@@ -9,6 +9,8 @@ import koh.service.manager.vps.kafka.KafkaReqTopic;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 
+import static koh.service.manager.vps.kafka.KafkaReqTopic.*;
+
 public class App {
     final KafkaConfig kafkaConfig;
     final KafkaConsumer<String, String> consumer;
@@ -26,8 +28,7 @@ public class App {
         );
     }
 
-    App()
-            throws Exception {
+    App() {
         this.kafkaConfig = new KafkaConfig(AppConfig.KAFKA_HOST, AppConfig.KAFKA_PORT, AppConfig.KAFKA_GROUP);
         this.consumer = new KafkaConsumer<>(this.kafkaConfig.getConsumerProperties());
         this.producer = new KafkaProducer<>(this.kafkaConfig.getProducerProperties());
@@ -36,13 +37,15 @@ public class App {
     }
 
     void start() {
-        consumerWorker.addHandler(KafkaReqTopic.TOPIC_VPS_CONNECT_REQUEST, new ConnectDockerHandler(producerWorker));
-        consumerWorker.addHandler(KafkaReqTopic.TOPIC_VPS_START_REQUEST, new StartDockerHandler(producerWorker));
-        consumerWorker.addHandler(KafkaReqTopic.TOPIC_VPS_STOP_REQUEST, new StopDockerHandler(producerWorker));
-        consumerWorker.addHandler(KafkaReqTopic.TOPIC_VPS_CREATE_CONTAINER_REQUEST, new CreateContainerHandler(producerWorker));
-        consumerWorker.addHandler(KafkaReqTopic.TOPIC_VPS_CREATE_IMAGE_REQUEST, new CreateImageHandler(producerWorker));
-        consumerWorker.addHandler(KafkaReqTopic.TOPIC_VPS_CREATE_NETWORK_REQUEST, new CreateNetworkHandler(producerWorker));
-        consumerWorker.addHandler(KafkaReqTopic.TOPIC_VPS_CREATE_VOLUME_REQUEST, new CreateVolumeHandler(producerWorker));
+        consumerWorker.addHandler(TOPIC_VPS_CONNECT_REQUEST, new ConnectDockerHandler(producerWorker));
+        consumerWorker.addHandler(TOPIC_VPS_START_REQUEST, new StartDockerHandler(producerWorker));
+        consumerWorker.addHandler(TOPIC_VPS_STOP_REQUEST, new StopDockerHandler(producerWorker));
+        consumerWorker.addHandler(TOPIC_VPS_CREATE_CONTAINER_REQUEST, new CreateContainerHandler(producerWorker));
+        consumerWorker.addHandler(TOPIC_VPS_CREATE_IMAGE_REQUEST, new CreateImageHandler(producerWorker));
+        consumerWorker.addHandler(TOPIC_VPS_CREATE_NETWORK_REQUEST, new CreateNetworkHandler(producerWorker));
+        consumerWorker.addHandler(TOPIC_VPS_CREATE_VOLUME_REQUEST, new CreateVolumeHandler(producerWorker));
+        consumerWorker.addHandler(TOPIC_VPS_CREATE_VPS_REQUEST, new CreateVpsHandler(producerWorker));
+
         consumerWorker.exec();
     }
 

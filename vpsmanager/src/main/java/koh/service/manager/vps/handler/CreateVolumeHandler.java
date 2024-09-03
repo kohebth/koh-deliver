@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import static koh.service.manager.vps.kafka.KafkaRespTopic.TOPIC_VPS_CREATE_VOLUME_RESPONSE;
-import static koh.service.manager.vps.kafka.KafkaRespTopic.TOPIC_VPS_START_RESPONSE;
 
 @Slf4j
 public class CreateVolumeHandler extends AbstractRemoteHandler {
@@ -21,7 +20,7 @@ public class CreateVolumeHandler extends AbstractRemoteHandler {
     }
 
     @Override
-    public boolean accept(ConsumerRecord<String, String> rawMessage)
+    public void handle(ConsumerRecord<String, String> rawMessage)
             throws Exception {
         CreateVolumeMessage message = JsonTools.fromJson(rawMessage.value(), CreateVolumeMessage.class);
         DockerVolumeRecord volume = volumeRepository.createVolume(message.getName(),
@@ -31,9 +30,8 @@ public class CreateVolumeHandler extends AbstractRemoteHandler {
         );
         if (volume.insert() == 1) {
             bus.respond(TOPIC_VPS_CREATE_VOLUME_RESPONSE, rawMessage.key(), new StatusMessage(volume.toString()));
-            return true;
+        } else {
+            bus.respond(TOPIC_VPS_CREATE_VOLUME_RESPONSE, rawMessage.key(), new StatusMessage("Failure"));
         }
-        bus.respond(TOPIC_VPS_CREATE_VOLUME_RESPONSE, rawMessage.key(), new StatusMessage("Failure"));
-        return false;
     }
 }

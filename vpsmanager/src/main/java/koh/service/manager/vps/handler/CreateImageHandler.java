@@ -17,14 +17,13 @@ public class CreateImageHandler extends AbstractRemoteHandler {
     }
 
     @Override
-    public boolean accept(ConsumerRecord<String, String> rawMessage)
+    public void handle(ConsumerRecord<String, String> rawMessage)
             throws Exception {
         CreateImageMessage message = JsonTools.fromJson(rawMessage.value(), CreateImageMessage.class);
-        DockerImageRecord image = networkRepository.createImage(
+        networkRepository.createImage(
                 message.getName(),
                 message.getRepo(),
                 message.getVersion()
         );
-        return image != null && image.getId() != null;
     }
 }

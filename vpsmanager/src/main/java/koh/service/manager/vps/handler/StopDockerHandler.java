@@ -10,7 +10,7 @@ import koh.service.manager.vps.tools.JsonTools;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import static koh.service.manager.vps.kafka.KafkaRespTopic.*;
+import static koh.service.manager.vps.kafka.KafkaRespTopic.TOPIC_VPS_START_RESPONSE;
 
 @Slf4j
 public class StopDockerHandler extends AbstractRemoteHandler {
@@ -23,7 +23,7 @@ public class StopDockerHandler extends AbstractRemoteHandler {
 
 
     @Override
-    public boolean accept(ConsumerRecord<String, String> rawMessage)
+    public void handle(ConsumerRecord<String, String> rawMessage)
             throws Exception {
 
         ContainerIdMessage message = JsonTools.fromJson(rawMessage.value(), ContainerIdMessage.class);
@@ -34,9 +34,9 @@ public class StopDockerHandler extends AbstractRemoteHandler {
 
         if (docker.isRunning(container) == null) {
             bus.respond(TOPIC_VPS_START_RESPONSE, rawMessage.key(), new StatusMessage("Success"));
-            return true;
+        } else {
+            bus.respond(TOPIC_VPS_START_RESPONSE, rawMessage.key(), new StatusMessage("Failure"));
+            throw new IllegalStateException(String.format("Container %s is unable to stop", container));
         }
-        bus.respond(TOPIC_VPS_START_RESPONSE, rawMessage.key(), new StatusMessage("Failure"));
-        throw new IllegalStateException(String.format("Container %s is unable to stop", container));
     }
 }

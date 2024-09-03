@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import static koh.service.manager.vps.kafka.KafkaRespTopic.TOPIC_VPS_CREATE_NETWORK_RESPONSE;
-import static koh.service.manager.vps.kafka.KafkaRespTopic.TOPIC_VPS_CREATE_VOLUME_RESPONSE;
 
 @Slf4j
 public class CreateNetworkHandler extends AbstractRemoteHandler {
@@ -23,7 +22,7 @@ public class CreateNetworkHandler extends AbstractRemoteHandler {
     }
 
     @Override
-    public boolean accept(ConsumerRecord<String, String> rawMessage)
+    public void handle(ConsumerRecord<String, String> rawMessage)
             throws Exception {
 
 
@@ -35,9 +34,8 @@ public class CreateNetworkHandler extends AbstractRemoteHandler {
         );
         if (network.insert() == 1) {
             bus.respond(TOPIC_VPS_CREATE_NETWORK_RESPONSE, rawMessage.key(), new StatusMessage(network.toString()));
-            return true;
+        } else {
+            bus.respond(TOPIC_VPS_CREATE_NETWORK_RESPONSE, rawMessage.key(), new StatusMessage("Failure"));
         }
-        bus.respond(TOPIC_VPS_CREATE_NETWORK_RESPONSE, rawMessage.key(), new StatusMessage("Failure"));
-        return false;
     }
 }

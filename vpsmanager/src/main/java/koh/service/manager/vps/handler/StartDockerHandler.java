@@ -31,7 +31,7 @@ public class StartDockerHandler extends AbstractRemoteHandler {
     }
 
     @Override
-    public boolean accept(ConsumerRecord<String, String> rawMessage)
+    public void handle(ConsumerRecord<String, String> rawMessage)
             throws Exception {
         ContainerIdMessage message = JsonTools.fromJson(rawMessage.value(), ContainerIdMessage.class);
 
@@ -67,9 +67,9 @@ public class StartDockerHandler extends AbstractRemoteHandler {
 
         if (dockerContainerId != null && docker.isRunning(container) != null) {
             bus.respond(TOPIC_VPS_START_RESPONSE, rawMessage.key(), new StatusMessage("Success"));
-            return true;
+        } else {
+            bus.respond(TOPIC_VPS_START_RESPONSE, rawMessage.key(), new StatusMessage("Failure"));
+            throw new IllegalStateException(String.format("Container %s is unable to start", container));
         }
-        bus.respond(TOPIC_VPS_START_RESPONSE, rawMessage.key(), new StatusMessage("Success"));
-        throw new IllegalStateException(String.format("Container %s is unable to start", container));
     }
 }

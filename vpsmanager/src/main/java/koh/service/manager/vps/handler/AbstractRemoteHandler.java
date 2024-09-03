@@ -10,20 +10,4 @@ public abstract class AbstractRemoteHandler implements MessageHandler {
     AbstractRemoteHandler(KafkaProducerWorker bus) {
         this.bus = bus;
     }
-
-    @Override
-    public final void handle(ConsumerRecord<String, String> rawMessage) {
-        try {
-            if (accept(rawMessage)) {
-                log.info("Handled message {}", rawMessage);
-            } else {
-                log.warn("Rejected message {}", rawMessage);
-            }
-        } catch (Exception e) {
-            log.error("Caught {} while handling message {}", e.getStackTrace(), rawMessage);
-        }
-    }
-
-    protected abstract boolean accept(ConsumerRecord<String, String> rawMessage)
-            throws Exception;
 }
